@@ -17,40 +17,22 @@ W pobranym archiwum git należy utworzyć plik o nazwie .env który zawiera usta
     
     POSTGRES_PORT=5432
 
-Nastepnie w tej samej lokalizacji utwórz plik o nazwie entrypoint.sh
-O następującej treści:
+**Uwaga dla użytkowników Windows:**
+
+Przed uruchomieniem projektu upewnij się, że pliki skryptów mają poprawną sekwencję końca linii.  
+Zmień `CRLF` (Windows) na `LF` (Unix) dla plików `.sh` i `.py`, np. w `entrypoint.sh`.
+
+Możesz to zrobić za pomocą narzędzia `dos2unix`:
+
+```bash
+dos2unix entrypoint.sh
 ```
-#!/bin/bash
-
-echo  "Makemigrations"
-
-python  manage.py  makemigrations  core  --noinput
-
-echo  "==============================="
-
-  
-
-echo  "Migrate"
-
-python  manage.py  migrate  --noinput
-
-echo  "==============================="
-
-  
-
-echo  "Scrape default articles"
-
-python  manage.py  scrape_articles
-
-echo  "==============================="
-
-  
-
-echo  "Start server"
-
-exec  python  manage.py  runserver  0.0.0.0:8000
-```
-
+lub w edytorze np. VS Code:
+- Otwórz plik entrypoint.sh.
+- W prawym dolnym rogu kliknij CRLF.
+- Zmień na LF.
+- Zapisz plik.
+- 
 ## Utwórz kontenery za pomocą podanej komendy. Dla Windows potrzebny będzie terminal WSL
  ```bash
 docker compose up --build
