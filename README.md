@@ -20,10 +20,10 @@ W tym momencie kontenery zostaną utworzone dla django jak i bazy danych postgre
 Powyższy kod jest uruchamiany wewnątrz kontenera django i tyko wtedy on zadziała. Próba uruchomienia bez wspomnianych kontenerów zakończy się niepowodzeniem.
 
 4. Dostepne endpointy API:
-   Lista wszystkich artykułów w bazie danych
+Lista wszystkich artykułów w bazie danych
 - http://localhost:8000/api/articles/
-  Szczegóły danego artykułu gdzie <id> id wybranego artykułu
+Szczegóły danego artykułu gdzie <id> id wybranego artykułu
 - http://localhost:8000/api/articles/<id>
-  Filtrowanie poprzez nazwę domeny
+Filtrowanie poprzez nazwę domeny
 - http://localhost:8000/api/articles/?source=domain.com
   
