@@ -47,7 +47,7 @@ Filtrowanie poprzez nazwę domeny
 - Parser dat obsługuje język angielski („2 days ago”, „yesterday”, „3 hours ago”).
 
 ## Struktura katalogów projektu Webscrap
-
+```
 webscrap/
 ├── webscrap/                        # Konfiguracja Django
 │   ├── __init__.py
@@ -72,4 +72,4 @@ webscrap/
 ├── docker-compose.yml
 ├── requirements.txt
 └── README.md
-
+```
