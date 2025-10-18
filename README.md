@@ -20,7 +20,7 @@ W pobranym archiwum git należy utworzyć plik o nazwie .env który zawiera usta
 **Uwaga dla użytkowników Windows:**
 
 Przed uruchomieniem projektu upewnij się, że pliki skryptów mają poprawną sekwencję końca linii.  
-Zmień `CRLF` (Windows) na `LF` (Unix) dla plików `.sh` i `.py`, np. w `entrypoint.sh`.
+Zmień `CRLF` (Windows) na `LF` (Unix) dla plików `.sh` , dla `entrypoint.sh`.
 
 Możesz to zrobić za pomocą narzędzia `dos2unix`:
 
