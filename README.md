@@ -35,16 +35,30 @@ Filtrowanie poprzez nazwę domeny
 - Limit prób pobrania artykułu: 3 próby z rosnącym czasem oczekiwania.
 - Parser dat obsługuje język angielski („2 days ago”, „yesterday”, „3 hours ago”).
 
-6. Struktura projektu
+6. # Struktura katalogów projektu Webscrap
+
 webscrap/
-├── webscrap/                  # Konfiguracja Django
-├── scraper/
-│   ├── management/commands/
-│   │   └── scrape_articles.py # Komenda scrapera
-│   ├── models.py              # Model Article
-│   ├── views.py               # API endpointy
-│   └── serializers.py         # Serializacja danych
+├── webscrap/                        # Konfiguracja Django
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+├── scrap/                            # Aplikacja Django do scrapowania
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py                     # Model Article
+│   ├── views.py                      # API endpointy
+│   ├── serializers.py                # Serializacja danych
+│   ├── urls.py
+│   ├── migrations/
+│   │   └── __init__.py
+│   └── management/
+│       └── commands/
+│           └── scrape_articles.py    # Komenda scrapera
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
 └── README.md
+
