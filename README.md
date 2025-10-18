@@ -1,16 +1,10 @@
+
 ## Skopiuj repozytorium:
 
 ```bash
 git clone https://github.com/pakupek/Webscrap
 ```
-
-## Utwórz kontenery za pomocą podanej komendy. Dla Windows potrzebny będzie terminal WSL
- ```bash
-docker compose up --build
-```
-W tym momencie kontenery zostaną utworzone dla django jak i bazy danych postgresql. W trakcie tworzenia kontenerów domyślnie uruchomi się komenda scrape_articles która przetworzy domyślne adresy url i zapisze dane do bazy. Zostaną również zainstalowane wszystkie potrzebne biblioteki z pliku requirements.txt
-
-## Tworzenie pliku env
+## Tworzenie wymaganych plików
 W pobranym archiwum git należy utworzyć plik o nazwie .env który zawiera ustawienia bazy danych postgresql. Zawartość jaką musi mieć to:
 
     POSTGRES_DB=postgres
@@ -22,6 +16,47 @@ W pobranym archiwum git należy utworzyć plik o nazwie .env który zawiera usta
     POSTGRES_HOST=db
     
     POSTGRES_PORT=5432
+
+Nastepnie w tej samej lokalizacji utwórz plik o nazwie entrypoint.sh
+O następującej treści:
+```
+#!/bin/bash
+
+echo  "Makemigrations"
+
+python  manage.py  makemigrations  core  --noinput
+
+echo  "==============================="
+
+  
+
+echo  "Migrate"
+
+python  manage.py  migrate  --noinput
+
+echo  "==============================="
+
+  
+
+echo  "Scrape default articles"
+
+python  manage.py  scrape_articles
+
+echo  "==============================="
+
+  
+
+echo  "Start server"
+
+exec  python  manage.py  runserver  0.0.0.0:8000
+```
+
+## Utwórz kontenery za pomocą podanej komendy. Dla Windows potrzebny będzie terminal WSL
+ ```bash
+docker compose up --build
+```
+W tym momencie kontenery zostaną utworzone dla django jak i bazy danych postgresql. W trakcie tworzenia kontenerów domyślnie uruchomi się komenda scrape_articles która przetworzy domyślne adresy url i zapisze dane do bazy. Zostaną również zainstalowane wszystkie potrzebne biblioteki z pliku requirements.txt
+
 
 ## Uruchomienie scrapera
    Scraper domyślnie się odpala podczas tworzenia kontenerów. Scrapuje 4 domyślne adresy które są zapisane w pliku scrape_articles.py. Jest również opcja uruchomienia scrapera z argumentem -u który umożliwia scrapowanie listy adresów url podanych w konsoli. Na przykład:
