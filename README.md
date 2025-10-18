@@ -26,4 +26,25 @@ Szczegóły danego artykułu gdzie <id> id wybranego artykułu
 - http://localhost:8000/api/articles/<id>
 Filtrowanie poprzez nazwę domeny
 - http://localhost:8000/api/articles/?source=domain.com
-  
+
+5. Założenia i ograniczenia
+- Scraper działa w kontenerze Docker z Selenium Grid.
+- Skrypt zakłada obecność elementów <h1>, <article>, <time>, itp. – jeśli brak, pola zostaną puste.
+- Niektóre strony mogą blokować dostęp (403 Forbidden) lub wykrywać automaty.
+- Domyślne URL-e do scrapowania są skonfigurowane w komendzie scrape_articles.
+- Limit prób pobrania artykułu: 3 próby z rosnącym czasem oczekiwania.
+- Parser dat obsługuje język angielski („2 days ago”, „yesterday”, „3 hours ago”).
+
+6. Struktura projektu
+webscrap/
+├── webscrap/                  # Konfiguracja Django
+├── scraper/
+│   ├── management/commands/
+│   │   └── scrape_articles.py # Komenda scrapera
+│   ├── models.py              # Model Article
+│   ├── views.py               # API endpointy
+│   └── serializers.py         # Serializacja danych
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
