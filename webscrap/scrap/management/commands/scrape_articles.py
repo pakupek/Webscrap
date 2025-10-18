@@ -2,7 +2,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from dateutil import parser
-import pytz, re, time, django, os, sys, structlog
+import pytz, re, time, django, os, sys, structlog, random
 from django.core.management.base import BaseCommand
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import TimeoutException, WebDriverException
@@ -68,12 +68,18 @@ class Command(BaseCommand):
         from scrap.models import Article
         
         SELENIUM_DOCKER_URL = "http://selenium:4444/wd/hub"
+        COUNT = 1
+        MAX_SCRAPE_TRIES = 3
+        SLEEP_TIME = 3
+        CURRENT_TRY = 0
+
+        user_agents = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/118.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/117.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/116.0.5845.140 Safari/537.36",
+            
+        ]
         
-        # Opcje Chrome
-        options = Options()
-        options.add_argument("--headless")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
 
         # Lista artykułów do scrapowania
         urls_arg = kwargs.get('url')
@@ -92,18 +98,10 @@ class Command(BaseCommand):
                 "https://take-group.github.io/example-blog-without-ssr/co-mozna-zrobic-ze-schabu-oprocz-kotletow-5-zaskakujacych-przepisow",
             ]
 
-        
-        driver = webdriver.Remote(
-            command_executor=SELENIUM_DOCKER_URL,
-            options=options
-        )
-        COUNT = 1
-        MAX_SCRAPE_TRIES = 3
-        SLEEP_TIME = 3
-        CURRENT_TRY = 0
-
+    
         # Scrapowanie artykułów 
         for url in urls:
+            CURRENT_TRY = 0
             if not url or not isinstance(url, str) or not url.startswith("http"):
                 logger.warning(f"Invalid URL: {url}")
                 logger.warning("Skipping")
@@ -118,10 +116,28 @@ class Command(BaseCommand):
             else:
                 while CURRENT_TRY < MAX_SCRAPE_TRIES:
                     try:
+                        options = Options()
+                        user_agent = random.choice(user_agents)
+                        options.add_argument(f"user-agent={user_agent}")
+                        options.add_argument("--headless=new")
+                        options.add_argument("--no-sandbox")
+                        options.add_argument("--disable-dev-shm-usage")
+                        options.add_argument("--disable-gpu")
+                        options.add_argument("--disable-blink-features=AutomationControlled")
+                        options.add_argument("--remote-debugging-port=9222")
+
+                        
+                        driver = webdriver.Remote(command_executor=SELENIUM_DOCKER_URL, options=options)
+
                         logger.info(f"Scraping article ({COUNT}/{len(urls)})")
                         COUNT += 1
                         driver.get(url)
                         soup = BeautifulSoup(driver.page_source, "html.parser")
+
+                        if "403" in driver.page_source or "Forbidden" in driver.page_source:
+                            logger.warning(f"Access blocked by server for URL: {url}")
+                            driver.quit()
+                            break
 
 
                         # Wyciąganie tytułu 
@@ -141,7 +157,7 @@ class Command(BaseCommand):
                             content_text = content_html_tag.get_text(separator="\n", strip=True)
                             logger.info("Content of the page was found! ")
                         else:
-                            content_text, content_html = ""
+                            content_text, content_html = ("","")
                             logger.warning("Content of the page was not found! ")
 
 
@@ -158,19 +174,22 @@ class Command(BaseCommand):
 
                         # Zapis do bazy artykułów
                         Article.objects.create(title=title,content_html=content_html,content_text=content_text,url=url,published_at=published_at)
-                        time.sleep(2) 
+                        time.sleep(SLEEP_TIME)
+                        driver.quit() 
                         break
                     
                     # Wyjątek gdy strona nie zostanie załadowana 
                     except (TimeoutException, WebDriverException) as e:
                         CURRENT_TRY += 1
                         logger.warning(f"Page load failed ({CURRENT_TRY}/{MAX_SCRAPE_TRIES}) for {url}: {e}")
-                        time.sleep(SLEEP_TIME)
+                        time.sleep(SLEEP_TIME * CURRENT_TRY)
+                        
 
                     except Exception as e:
                         logger.error("Scraping error", error=str(e), url=url, timestamp=time.time())
-                        continue
-                    break
+                        driver.quit()
+                        break
+                    
 
         logger.info("Scraping finished!")
-        driver.quit()
+        
