@@ -31,12 +31,10 @@ W pobranym archiwum git należy utworzyć plik o nazwie .env który zawiera usta
 Powyższy kod jest uruchamiany wewnątrz kontenera django i tyko wtedy on zadziała. Próba uruchomienia bez wspomnianych kontenerów zakończy się niepowodzeniem.
 
 ## Dostepne endpointy API:
-Lista wszystkich artykułów w bazie danych
-- http://localhost:8000/api/articles/
-Szczegóły danego artykułu gdzie id wybranego artykułu
-- http://localhost:8000/api/articles/id
-Filtrowanie poprzez nazwę domeny
-- http://localhost:8000/api/articles/?source=domain.com
+
+- http://localhost:8000/api/articles/   ->  Lista wszystkich artykułów w bazie danych
+- http://localhost:8000/api/articles/id  -> Szczegóły danego artykułu gdzie id wybranego artykułu
+- http://localhost:8000/api/articles/?source=domain.com   ->  Filtrowanie poprzez nazwę domeny
 
 ## Założenia i ograniczenia
 - Scraper działa w kontenerze Docker z Selenium Grid.
